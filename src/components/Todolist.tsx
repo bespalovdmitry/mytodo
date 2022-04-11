@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import {
     Box,
     Button,
@@ -31,27 +31,35 @@ export const Todolist = (props: TodoPropsType) => {
         setNewTaskTitle(event.currentTarget.value)
     }
     const onClickAddTaskHandler = () => {
-        props.addTask(newTaskTitle)
+        newTaskTitle.trim() !== '' && props.addTask(newTaskTitle)
         setNewTaskTitle('')
     }
+    const onKeyPressAddTask = (e: KeyboardEvent<HTMLDivElement>) => {
+        e.key==='Enter' && onClickAddTaskHandler()
+    }
+    const onClickRemoveTaskHandler = (taskId: string) => {props.removeTask(taskId)}
 
     return (
         <Paper sx={{padding: 2}}>
             <Typography variant={'h5'} textAlign={'center'}>{props.title}</Typography>
             <Box display={'flex'} alignItems={'flex-end'}>
-                <TextField value={newTaskTitle} onChange={onChangeNewTaskTitle} label={'Add task'} variant={'standard'}/>
+                <TextField
+                    value={newTaskTitle}
+                    onChange={onChangeNewTaskTitle}
+                    onKeyPress={onKeyPressAddTask}
+                    label={'Add task'}
+                    variant={'standard'}/>
                 <Button  onClick={onClickAddTaskHandler} variant={'contained'} sx={{ml: 1}}>Add</Button>
             </Box>
             <List>
                 {props.tasks.map(task => {
-                    const onClickRemoveTaskHandler = () => {props.removeTask(task.id)}
                     const onChangeStatusHandler = (event: ChangeEvent<HTMLInputElement>) => {
                       props.changeStatus(task.id, event.currentTarget.checked)
                     }
                     return (
                         <Box key={task.id} display={'flex'} alignItems={'center'}>
                             <Checkbox onChange={onChangeStatusHandler} checked={task.isDone}/>
-                            <IconButton onClick={onClickRemoveTaskHandler}><DeleteOutlineIcon/></IconButton>
+                            <IconButton onClick={() => onClickRemoveTaskHandler(task.id)}><DeleteOutlineIcon/></IconButton>
                             <ListItem>{task.title}</ListItem>
                         </Box>
                     )
