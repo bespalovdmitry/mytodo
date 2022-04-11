@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import {
     Box,
     Button,
@@ -19,24 +19,38 @@ type TodoPropsType = {
     tasks: Array<TaskType>
     removeTask: (taskId: string) => void
     filterTask: (filterValue: FilterType) => void
+    addTask: (newTaskTitle: string) => void
+    changeStatus: (taskId: string, isDone: boolean) => void
 }
 export const Todolist = (props: TodoPropsType) => {
+    const [newTaskTitle, setNewTaskTitle] = useState<string>('')
     const onClickChangeFilterHandler = (filter: FilterType) => {
       props.filterTask(filter)
     }
+    const onChangeNewTaskTitle = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setNewTaskTitle(event.currentTarget.value)
+    }
+    const onClickAddTaskHandler = () => {
+        props.addTask(newTaskTitle)
+        setNewTaskTitle('')
+    }
+
     return (
         <Paper sx={{padding: 2}}>
             <Typography variant={'h5'} textAlign={'center'}>{props.title}</Typography>
             <Box display={'flex'} alignItems={'flex-end'}>
-                <TextField label={'Add task'} variant={'standard'}/>
-                <Button  variant={'contained'} sx={{ml: 1}}>Add</Button>
+                <TextField value={newTaskTitle} onChange={onChangeNewTaskTitle} label={'Add task'} variant={'standard'}/>
+                <Button  onClick={onClickAddTaskHandler} variant={'contained'} sx={{ml: 1}}>Add</Button>
             </Box>
             <List>
                 {props.tasks.map(task => {
                     const onClickRemoveTaskHandler = () => {props.removeTask(task.id)}
+                    const onChangeStatusHandler = (event: ChangeEvent<HTMLInputElement>) => {
+                      props.changeStatus(task.id, event.currentTarget.checked)
+                    }
                     return (
                         <Box key={task.id} display={'flex'} alignItems={'center'}>
-                            <Checkbox checked={task.isDone}/>
+                            <Checkbox onChange={onChangeStatusHandler} checked={task.isDone}/>
                             <IconButton onClick={onClickRemoveTaskHandler}><DeleteOutlineIcon/></IconButton>
                             <ListItem>{task.title}</ListItem>
                         </Box>

@@ -24,6 +24,13 @@ function App() {
     const filterTask = (filterValue: FilterType) => {
         setFilter(filterValue)
     }
+    const addTask = (newTaskTitle: string) => {
+        const newTask = {id: v1(), title: newTaskTitle, isDone: false}
+        setTasks([newTask, ...tasks])
+    }
+    const changeStatus = (taskId: string, isDone: boolean) => {
+        setTasks(tasks.map(task => task.id ===taskId ? {...task, isDone} : task))
+    }
 
     let filteredTask = tasks
     if (filter === 'active') {
@@ -40,6 +47,8 @@ function App() {
                 tasks={filteredTask}
                 removeTask={removeTask}
                 filterTask={filterTask}
+                addTask={addTask}
+                changeStatus={changeStatus}
             />
         </div>
     );
